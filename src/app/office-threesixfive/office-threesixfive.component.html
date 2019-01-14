@@ -1,0 +1,41 @@
+<div class="container">
+  <h1>Office 365 Entry</h1>
+
+  <div><span>Server Address: </span>{{server}}</div>
+
+  <form (ngSubmit)="onSubmit()" #calendarForm="ngForm">
+    {{diagnostic}}
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" class="form-control" id="username" required
+             [(ngModel)]="user" name="username" #name="ngModel">
+      <div [hidden]="name.valid || name.pristine" class="alert alert-danger">
+        Username is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="text" class="form-control" id="password" required
+             [(ngModel)]="password" name="password" #pass="ngModel">
+      <div [hidden]="pass.valid || pass.pristine" class="alert alert-danger">
+       Password is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <button (click)="setServiceAccount()">
+        <span *ngIf="!svcAcct">Enable Service Account</span>
+        <span *ngIf="svcAcct">Disable Service Account</span>
+      </button>
+      <label *ngIf="svcAcct">
+        <input type="text" class="form-control" id="resource-account"
+               [(ngModel)]="resourceAcct" name="resource-account">
+      </label>
+    </div>
+
+    <button type="submit" class="btn btn-success"
+            [disabled]="!calendarForm.form.valid">Test</button>
+    {{xmlResponse}}
+  </form>
+</div>
