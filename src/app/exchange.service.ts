@@ -13,13 +13,21 @@ import { MessageService } from './message.service';
 export class ExchangeService {
   private abstractCalendar: Calendar;
   private baseURL = 'EWS/Exchange.asmx';
+  private responseCodeMatch = new RegExp('\<m:ResponseCode>(.*?)\<');
+  private folderIdMatch = new RegExp('<t:FolderId Id="(.*?)"');
+  private changekeyIdMatch = new RegExp('ChangeKey="(.*?)"');
+  response: string;
 
-  // ###################### Constructor #############################
+  // ###################### Constructor ############################# //
   constructor(
     private http: HttpClient,
     private messageService: MessageService,
   ) { }
 
+  // ################# Remote Server Requests ####################### //
+  // Unfortunately (for Angular), this is a SOAP API, so
+  // the repsonse has to be parsed through manually because
+  // it's all in XML.
   getFolderId(): Observable<any> {
     let headers = new HttpHeaders({
       'Content-Type': 'text/xml',
@@ -46,10 +54,22 @@ export class ExchangeService {
                                   </soap:Body>
                                 </soap:Envelope>`
 
-    let response : Observable<any> = this.http.post(requestURL, baseXML, {headers: headers})
-      .pipe(
-        catchError(this.handleError())
-      );
+    return this.http.post(requestURL,
+                          baseXML,
+                          {headers: headers,
+                          responseType: 'text'})
+      .pipe(catchError(this.handleError()));
+  }
+
+  /** Finds the response results and sets the folder ID, if possible */
+  setFolderId(xmlData: string): string {
+    let response: string = this.responseCodeMatch.exec(xmlData)[1];
+    console.log("SetFolder: " + response); // "NoError"
+    if (response == "NoError") {
+      this.abstractCalendar.setFolderId(this.folderIdMatch.exec(xmlData)[1]);
+      this.abstractCalendar.setChangeId(this.changekeyIdMatch.exec(xmlData)[1]);
+      console.log("values are set"); // Does log
+    }
     return response;
   }
 
@@ -57,6 +77,9 @@ export class ExchangeService {
     this.abstractCalendar = calendar;
   }
 
+  checkErrorResponse(): string { return this.response; }
+
+  // ################# Private Helper Methods ####################### //
   /** Log a HeroService message with the MessageService */
   private log(message: string) {
     this.messageService.add(`ExchangeService: ${message}`);

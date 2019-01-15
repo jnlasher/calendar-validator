@@ -57,7 +57,8 @@ export class OfficeThreesixfiveComponent implements OnInit {
 
     // First step is to find the folder ID
     this.exchangeService.getFolderId()
-    .subscribe(data => {console.log(JSON.stringify(data))});
+        .subscribe(data =>
+        { this.response = this.exchangeService.setFolderId(data) });
   }
 
   // TODO: Remove this when we're done

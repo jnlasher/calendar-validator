@@ -5,6 +5,7 @@ export class Calendar {
   public enableSvcAcct: boolean;
   public resourceAcct?: string;
   private folderId: string;
+  private changeId: string;
 
   constructor(serverAddress, username, password,
               enableSvcAcct, resourceAcct) {
@@ -17,5 +18,9 @@ export class Calendar {
 
   setFolderId(folderId: string): void {
     this.folderId = folderId;
+  }
+
+  setChangeId(changeId: string): void {
+    this.changeId = changeId;
   }
 }
