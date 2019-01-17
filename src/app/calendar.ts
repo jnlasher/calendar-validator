@@ -1,4 +1,5 @@
 export class Calendar {
+  // Calendar properties
   public serverAddress: string;
   public username: string;
   public password: string;

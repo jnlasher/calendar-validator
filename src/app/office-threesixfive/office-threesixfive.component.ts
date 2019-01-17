@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
 import { Parser } from 'xml2js';
-
 import { Calendar } from '../calendar';
 import { ExchangeService } from '../exchange.service';
 
@@ -20,9 +18,7 @@ export class OfficeThreesixfiveComponent implements OnInit {
   response: string;
   parser: Parser;
 
-  // ################## Constructor ####################### //
   constructor(private exchangeService: ExchangeService) {
-    // Fields for O365
     this.server = 'https://outlook.office365.com/';
     this.user = '';
     this.password = '';
@@ -31,18 +27,10 @@ export class OfficeThreesixfiveComponent implements OnInit {
     this.parser = new Parser();
   }
 
-  // ################## Service Calls #################### //
-
-  // ################## Helper Methods ################### //
-  // Angular on init method
   ngOnInit() { }
 
-  // Toggles the service account option
-  setServiceAccount() {
-    this.svcAcct = !this.svcAcct;
-  }
+  ngOnDestroy() { }
 
-  // Submit the form
   onSubmit() {
     // Build the calendar with the form details
     // and add it to the service
@@ -53,12 +41,26 @@ export class OfficeThreesixfiveComponent implements OnInit {
       this.svcAcct,
       this.resourceAcct
     );
-    this.exchangeService.setCalendar(this.calendar);
 
-    // First step is to find the folder ID
+    this.exchangeService.setCalendar(this.calendar);
+    this.getFolderId();
+    /*
     this.exchangeService.getFolderId()
-        .subscribe(data =>
-        { this.response = this.exchangeService.setFolderId(data) });
+        .subscribe(
+          data => { this.response = this.exchangeService.setFolderId(data) }
+        );
+    */
+  }
+
+  getFolderId(): void {
+    this.exchangeService.getFolderId()
+      .subscribe(
+        data => console.log("Component data: \n" + JSON.stringify(data))
+      )
+  }
+
+  setServiceAccount() {
+    this.svcAcct = !this.svcAcct;
   }
 
   // TODO: Remove this when we're done
