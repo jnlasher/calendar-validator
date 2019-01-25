@@ -1,8 +1,10 @@
 export class ErrorResponse {
   // HTTP status codes
-  public static readonly OK: string = "200 OK";
-  public static readonly UNAUTHORIZED: string = "401 Unauthorized";
-  public static readonly FORBIDDEN: string = "403 Forbidden";
+  public static readonly OK: number = 200;
+  public static readonly UNAUTHORIZED: number = 401;
+  public static readonly FORBIDDEN: number = 403;
+  public static readonly NOT_FOUND: number = 404;
+  public static readonly SERVER_ERROR: number = 500;
 
   // response properties
   statusCode: number;
@@ -18,7 +20,7 @@ export class ErrorResponse {
   setStatusCode(statusCode: number) {
     this.statusCode = statusCode;
   }
-  
+
   setResponseString(responseString: string) {
     this.responseString = responseString;
   }

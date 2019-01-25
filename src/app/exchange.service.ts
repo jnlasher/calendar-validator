@@ -11,21 +11,18 @@ import { ErrorResponse } from './response'
 export class ExchangeService {
   private abstractCalendar: Calendar;
   private baseURL = 'EWS/Exchange.asmx';
-  private responseCodeMatch = new RegExp('\<m:ResponseCode>(.*?)\<');
-  private folderIdMatch = new RegExp('<t:FolderId Id="(.*?)"');
-  private changekeyIdMatch = new RegExp('ChangeKey="(.*?)"');
+  private responseCodeMatch = new RegExp('\<m:ResponseCode>(.+?)\<');
+  private folderIdMatch = new RegExp('<t:FolderId Id="(.+?)"');
+  private changekeyIdMatch = new RegExp('ChangeKey="(.+?)"');
   private response: ErrorResponse;
+  private exchImpString: string;
 
   responseObservable = new Observable((observer) => {
     observer.next(this.response);
     observer.complete();
   });
 
-  constructor(
-    private http: HttpClient,
-  ) {
-    //this.response.statusCode = 401;
-  }
+  constructor(private http: HttpClient) { }
 
   getFolderId(): Observable<any> {
     let headers = new HttpHeaders({
@@ -40,6 +37,7 @@ export class ExchangeService {
                                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                                   <soap:Header>
                                     <t:RequestServerVersion Version="Exchange2007_SP1" />
+                                    ${this.exchImpString}
                                   </soap:Header>
                                   <soap:Body>
                                     <m:GetFolder>
@@ -71,11 +69,7 @@ export class ExchangeService {
                                        xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types"
                                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
                                   <soap:Header>
-                                    <t:ExchangeImpersonation>
-                                        <t:ConnectingSID>
-                                            <t:SmtpAddress>${this.abstractCalendar.resourceAcct}</t:SmtpAddress>
-                                        </t:ConnectingSID>
-                                    </t:ExchangeImpersonation>
+                                    ${this.exchImpString}
                                   </soap:Header>
                                   <soap:Body>
                                     <m:GetFolder>
@@ -96,7 +90,6 @@ export class ExchangeService {
   }
 
   setFolderId(xmlData: string): string {
-    console.log("Data to set was: " + xmlData);
     let response: string = this.responseCodeMatch.exec(xmlData)[1];
     if (response == "NoError") {
       this.abstractCalendar.setFolderId(this.folderIdMatch.exec(xmlData)[1]);
@@ -107,11 +100,24 @@ export class ExchangeService {
 
   setCalendar(calendar: Calendar): void {
     this.abstractCalendar = calendar;
+    this.setResourceAccountHeader();
   }
 
   private handleError<ErrorResponse> () {
     return (error: any): Observable<ErrorResponse> => {
       return of(error);
+    }
+  }
+
+  private setResourceAccountHeader(): void {
+    if(this.abstractCalendar.enableSvcAcct) {
+      this.exchImpString = `<t:ExchangeImpersonation>
+                                <t:ConnectingSID>
+                                    <t:SmtpAddress>${this.abstractCalendar.resourceAcct}</t:SmtpAddress>
+                                </t:ConnectingSID>
+                            </t:ExchangeImpersonation>`;
+    } else if(!this.abstractCalendar.enableSvcAcct) {
+      this.exchImpString = ``;
     }
   }
 }

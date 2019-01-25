@@ -24,7 +24,7 @@
     </div>
 
     <div class="form-group">
-      <button (click)="setServiceAccount()">
+      <button class="btn btn-success" (click)="setServiceAccount()">
         <span *ngIf="!svcAcct">Enable Service Account</span>
         <span *ngIf="svcAcct">Disable Service Account</span>
       </button>
@@ -36,6 +36,12 @@
 
     <button type="submit" class="btn btn-success"
             [disabled]="!calendarForm.form.valid">Test</button>
-    {{response}}
   </form>
+
+  <div class="login-success" *ngIf="!isErrorResult">
+    {{response}}
+  </div>
+  <div class="login-failure" *ngIf="isErrorResult">
+    {{response}}
+  </div>
 </div>
