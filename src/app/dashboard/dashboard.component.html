@@ -1,11 +1,53 @@
 <h1>
   Welcome to the {{ title }}
 </h1>
-<div role="main">
-  <h2>Select your calendar server type: </h2>
-  <nav>
-      <button type="button" class="btn btn-primary" routerLink="/google-calendar">Google Calendar</button>
-      <button type="button" class="btn btn-primary" routerLink="/office-365">Office 365</button>
-      <button type="button" class="btn btn-primary" routerLink="/ms-exchange">Microsoft Exchange</button>
-  </nav>
+
+<div fxLayout="row" class="calendar-selection">
+  <mat-card class="office365-card">
+    <mat-card-header>
+      <mat-card-title>Office 365</mat-card-title>
+      <mat-card-subtitle>https://outlook.office365.com/</mat-card-subtitle>
+    </mat-card-header>
+    <img mat-card-image src="assets/office365-logo.png" alt="Office 365 Logo">
+    <mat-card-content>
+      <p>
+        Placeholder text.
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" routerLink="/office-365">Office 365</button>
+    </mat-card-actions>
+  </mat-card>
+
+  <mat-card class="exchange-card">
+    <mat-card-header>
+      <mat-card-title>Exchange Server</mat-card-title>
+      <mat-card-subtitle>On Premise Server</mat-card-subtitle>
+    </mat-card-header>
+    <img mat-card-image src="assets/exchange-logo.png" alt="Exchange Logo">
+    <mat-card-content>
+      <p>
+        Placeholder text.
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" routerLink="/ms-exchange">Exchange Calendar</button>
+    </mat-card-actions>
+  </mat-card>
+
+  <mat-card class="google-card">
+    <mat-card-header>
+      <mat-card-title>Google Calendar</mat-card-title>
+      <mat-card-subtitle>https://calendar./</mat-card-subtitle>
+    </mat-card-header>
+    <img mat-card-image src="assets/gcal-logo.png" alt="GCal Logo">
+    <mat-card-content>
+      <p>
+        Placeholder text.
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" routerLink="/google-calendar">Google Calendar</button>
+    </mat-card-actions>
+  </mat-card>
 </div>

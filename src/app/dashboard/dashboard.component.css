@@ -3,6 +3,7 @@ body {
   padding-bottom: 30px;
 }
 
-button.btn.btn-primary {
-  margin: 5px;
+.calendar-selection img {
+  width: 400;
+  height: 400;
 }
