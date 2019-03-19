@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { GcalendarService } from '../gcalendar.service';
+import { GcalendarService } from '../calendar-services/gcalendar.service';
 
 @Component({
   selector: 'app-google-calendar',

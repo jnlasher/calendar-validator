@@ -1,14 +1,14 @@
-import {Component, OnInit} from '@angular/core';
-import {NestedTreeControl} from '@angular/cdk/tree';
-import {MatTreeNestedDataSource} from '@angular/material/tree';
-import {Observable, BehaviorSubject} from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { NestedTreeControl } from '@angular/cdk/tree';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { Observable, BehaviorSubject } from 'rxjs';
 
-import { ExchangeService } from '../exchange.service';
-import { FileNode, FileDatabase } from '../database.service';
-import { Calendar } from '../calendar';
-import { ErrorResponse } from '../response';
+import { ExchangeService } from '../calendar-services/exchange.service';
+import { FileNode, FileDatabase } from '../database-services/database.service';
+import { Calendar } from '../calendar-services/calendar';
+import { ErrorResponse } from '../calendar-services/response';
 
-const FAULT_CODE_MATCH = new RegExp('<faultcode .*>a:(.+?)<\/faultcode>');
+const FAULT_CODE_MATCH   = new RegExp('<faultcode .*>a:(.+?)<\/faultcode>');
 const FAULT_STRING_MATCH = new RegExp('<faultstring .*>(.+?)<\/faultstring>');
 
 @Component({
@@ -18,21 +18,23 @@ const FAULT_STRING_MATCH = new RegExp('<faultstring .*>(.+?)<\/faultstring>');
   providers: [FileDatabase]
 })
 export class OfficeThreesixfiveComponent implements OnInit {
-  server: string;
-  user: string;
-  password: string;
-  svcAcct: boolean;
+  // Calendar identifiers
+  server:       string;
+  user:         string;
+  password:     string;
   resourceAcct: string;
-  calendar: Calendar;
-  response: string;
-  isErrorResult: boolean;
-  hide = true;
+  premServer:   string;
+  calendar:     Calendar;
+  svcAcct:      boolean;
+  hybrid:       boolean;
+  hide:         boolean = true;
 
-  database: FileDatabase;
+  // Database instances
+  database:          FileDatabase;
   nestedTreeControl: NestedTreeControl<FileNode>;
-  nestedDataSource: MatTreeNestedDataSource<FileNode>;
-  dataChange: BehaviorSubject<FileNode[]>;
-  results: FileNode[] = [];
+  nestedDataSource:  MatTreeNestedDataSource<FileNode>;
+  dataChange:        BehaviorSubject<FileNode[]>;
+  results:           FileNode[] = [];
 
   constructor(private exchangeService: ExchangeService, database: FileDatabase) {
     // Server object structure
@@ -42,15 +44,13 @@ export class OfficeThreesixfiveComponent implements OnInit {
     this.database = database;
     this.nestedTreeControl = new NestedTreeControl<FileNode>(this._getChildren);
     this.nestedDataSource = new MatTreeNestedDataSource();
-    //this.dataChange = new BehaviorSubject<FileNode[]>(this.results);
     this.database.dataChange.subscribe(data => this.nestedDataSource.data = data);
   }
 
-  hasNestedChild = (_: number, nodeData: FileNode) => !nodeData.type;
-  private _getChildren = (node: FileNode) => node.children;
-
   ngOnInit() { }
+
   ngOnDestroy() { }
+
   onSubmit() {
     this.calendar = new Calendar(
       this.server,
@@ -70,17 +70,18 @@ export class OfficeThreesixfiveComponent implements OnInit {
       );
   }
 
+  hasNestedChild = (_: number, nodeData: FileNode) => !nodeData.type;
+
+  _getChildren = (node: FileNode) => node.children;
+
   setServiceAccount() { this.svcAcct = !this.svcAcct; }
+
+  setHybridEnvironment() { this.hybrid = !this.hybrid; }
 
   parseResponse(data: Observable<any>) {
     if(typeof data == "string") {
-      // console.log("Message:\n" + data);
-      this.response = "Success!";
-      this.isErrorResult = false;
     } else if (typeof data == "object") {
-      // console.log("Error:\n" + JSON.stringify(data));
       this.parseErrorResult(JSON.stringify(data));
-      this.isErrorResult = true;
     }
   }
 
@@ -115,7 +116,4 @@ export class OfficeThreesixfiveComponent implements OnInit {
     });
     this.database.dataChange.next(this.results);
   }
-
-  // TODO: Remove this when we're done
-  get diagnostic() { return JSON.stringify(this.calendar); }
 }

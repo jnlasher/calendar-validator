@@ -1,5 +1,5 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 /**
  * Json node data with nested structure. Each node has a filename and a value or a list of children
@@ -13,14 +13,7 @@ export class FileNode {
 /**
  * The Json tree data in string. The data could be parsed into Json object
  */
-const INITIAL_DATA = JSON.stringify({
-  Details: {
-    StatusCode: '',
-    Name: '',
-    Message: '',
-    MessageDetails: ''
-  }
-});
+const INITIAL_DATA = JSON.stringify({});
 
 /**
  * File database, it can build a tree structured Json object from string.

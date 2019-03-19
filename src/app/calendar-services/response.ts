@@ -1,15 +1,15 @@
 export class ErrorResponse {
   // HTTP status codes
-  public static readonly OK: number = 200;
+  public static readonly OK:           number = 200;
   public static readonly UNAUTHORIZED: number = 401;
-  public static readonly FORBIDDEN: number = 403;
-  public static readonly NOT_FOUND: number = 404;
+  public static readonly FORBIDDEN:    number = 403;
+  public static readonly NOT_FOUND:    number = 404;
   public static readonly SERVER_ERROR: number = 500;
 
   // response properties
-  statusCode: number;
+  statusCode:     number;
   responseString: string;
-  responseBody: string;
+  responseBody:   string;
 
   constructor(statusCode, responseString, responseBody) {
     this.statusCode = statusCode;

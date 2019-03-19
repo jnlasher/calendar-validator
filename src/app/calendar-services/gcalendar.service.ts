@@ -10,11 +10,11 @@ import { ErrorResponse } from './response'
 export class GcalendarService {
   // Google's OAuth 2.0 endpoint for requesting an access token
   private oauth2Endpoint: string = 'https://accounts.google.com/o/oauth2/device/code';
-  private scope: string = "https://www.googleapis.com/auth/calendar.readonly";
-  private response: ErrorResponse;
-  private clientID: string;
-  private authURI: string;
-  private clientSecret: string;
+  private scope:          string = "https://www.googleapis.com/auth/calendar.readonly";
+  private response:       ErrorResponse;
+  private clientID:       string;
+  private authURI:        string;
+  private clientSecret:   string;
 
   responseObservable = new Observable((observer) => {
     observer.next(this.response);

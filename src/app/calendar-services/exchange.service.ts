@@ -9,20 +9,25 @@ import { ErrorResponse } from './response'
   providedIn: 'root'
 })
 export class ExchangeService {
-  private abstractCalendar: Calendar;
-  private baseURL = 'EWS/Exchange.asmx';
-  private responseCodeMatch = new RegExp('\<m:ResponseCode>(.+?)\<');
-  private folderIdMatch = new RegExp('<t:FolderId Id="(.+?)"');
-  private changekeyIdMatch = new RegExp('ChangeKey="(.+?)"');
-  private response: ErrorResponse;
-  private exchImpString: string;
+  private abstractCalendar:   Calendar;
+  private baseURL:            string = 'EWS/Exchange.asmx';
+  private responseCodeMatch:  RegExp = new RegExp('\<m:ResponseCode>(.+?)\<');
+  private folderIdMatch:      RegExp = new RegExp('<t:FolderId Id="(.+?)"');
+  private changekeyIdMatch:   RegExp = new RegExp('ChangeKey="(.+?)"');
+  private response:           ErrorResponse;
+  private exchImpString:      string;
+  private soapEnvelope:       string;
+  private folderDetails:      string;
 
   responseObservable = new Observable((observer) => {
     observer.next(this.response);
     observer.complete();
   });
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    this.setSoapEnvelope();
+    this.setFolderDetails();
+  }
 
   getFolderId(): Observable<any> {
     let headers = new HttpHeaders({
@@ -31,23 +36,13 @@ export class ExchangeService {
     });
     const requestURL : string = this.abstractCalendar.serverAddress + this.baseURL;
     const baseXML : string = `<?xml version="1.0" encoding="utf-8"?>
-                                <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                       xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages"
-                                       xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types"
-                                       xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+                                <soap:Envelope ${this.soapEnvelope} >
                                   <soap:Header>
                                     <t:RequestServerVersion Version="Exchange2007_SP1" />
                                     ${this.exchImpString}
                                   </soap:Header>
                                   <soap:Body>
-                                    <m:GetFolder>
-                                      <m:FolderShape>
-                                        <t:BaseShape>IdOnly</t:BaseShape>
-                                      </m:FolderShape>
-                                      <m:FolderIds>
-                                        <t:DistinguishedFolderId Id="calendar" />
-                                      </m:FolderIds>
-                                    </m:GetFolder>
+                                    ${this.folderDetails}
                                   </soap:Body>
                                 </soap:Envelope>`
 
@@ -64,22 +59,12 @@ export class ExchangeService {
     });
     const requestURL : string = this.abstractCalendar.serverAddress + this.baseURL;
     const baseXML : string = `<?xml version="1.0" encoding="utf-8"?>
-                                <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                       xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages"
-                                       xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types"
-                                       xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+                                <soap:Envelope ${this.soapEnvelope}>
                                   <soap:Header>
                                     ${this.exchImpString}
                                   </soap:Header>
                                   <soap:Body>
-                                    <m:GetFolder>
-                                      <m:FolderShape>
-                                        <t:BaseShape>IdOnly</t:BaseShape>
-                                      </m:FolderShape>
-                                      <m:FolderIds>
-                                        <t:DistinguishedFolderId Id="calendar" />
-                                      </m:FolderIds>
-                                    </m:GetFolder>
+                                    ${this.folderDetails}
                                   </soap:Body>
                                 </soap:Envelope>`
 
@@ -119,5 +104,23 @@ export class ExchangeService {
     } else if(!this.abstractCalendar.enableSvcAcct) {
       this.exchImpString = ``;
     }
+  }
+
+  private setSoapEnvelope(): void {
+    this.soapEnvelope = `xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xmlns:m="http://schemas.microsoft.com/exchange/services/2006/messages"
+                        xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types"
+                        xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"`;
+  }
+
+  private setFolderDetails(): void {
+    this.folderDetails = `<m:GetFolder>
+                              <m:FolderShape>
+                                <t:BaseShape>IdOnly</t:BaseShape>
+                              </m:FolderShape>
+                              <m:FolderIds>
+                                <t:DistinguishedFolderId Id="calendar" />
+                              </m:FolderIds>
+                            </m:GetFolder>`;
   }
 }
