@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MessageService } from './message.service';
+import { GcalendarService } from './gcalendar.service';
 
-describe('MessageService', () => {
+describe('GcalendarService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: MessageService = TestBed.get(MessageService);
+    const service: GcalendarService = TestBed.get(GcalendarService);
     expect(service).toBeTruthy();
   });
 });

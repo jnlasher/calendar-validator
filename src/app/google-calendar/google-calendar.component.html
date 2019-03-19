@@ -1,1 +1,8 @@
-<p>Google Calendar placeholder</p>
+<div class="container">
+    <h1 class="mat-title">Google Calendar Entry</h1>
+    <div class="Block">
+        <label id="lbl">JSON File</label>
+        <input type='file' (change)="fileListener($event)">
+    </div>
+    <button mat-raised-button color="accent" (click)="createCalendarObject()">Upload</button>
+</div>

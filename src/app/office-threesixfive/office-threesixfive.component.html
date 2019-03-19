@@ -1,47 +1,77 @@
 <div class="container">
-  <h1>Office 365 Entry</h1>
-
-  <div><span>Server Address: </span>{{server}}</div>
+  <h1 class="mat-title">Office 365 Entry</h1>
+  <h2 class="mat-title">Server Address: {{server}}</h2>
 
   <form (ngSubmit)="onSubmit()" #calendarForm="ngForm">
-    {{diagnostic}}
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input type="text" class="form-control" id="username" required
-             [(ngModel)]="user" name="username" #name="ngModel">
-      <div [hidden]="name.valid || name.pristine" class="alert alert-danger">
-        Username is required
-      </div>
-    </div>
+    <mat-tab-group dynamicHeight>
 
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="text" class="form-control" id="password" required
-             [(ngModel)]="password" name="password" #pass="ngModel">
-      <div [hidden]="pass.valid || pass.pristine" class="alert alert-danger">
-       Password is required
-      </div>
-    </div>
+      <mat-tab label="Credentials">
+        <div class="form-group">
+          <mat-form-field>
+            <input matInput placeholder="Username" type="text"
+                   [(ngModel)]="user" name="username" #name="ngModel">
+          </mat-form-field>
+        </div>
 
-    <div class="form-group">
-      <button class="btn btn-success" (click)="setServiceAccount()">
-        <span *ngIf="!svcAcct">Enable Service Account</span>
-        <span *ngIf="svcAcct">Disable Service Account</span>
-      </button>
-      <label *ngIf="svcAcct">
-        <input type="text" class="form-control" id="resource-account"
-               [(ngModel)]="resourceAcct" name="resource-account">
-      </label>
-    </div>
+        <div class="form-group">
+          <mat-form-field>
+            <input matInput placeholder="Password" [type]="hide ? 'password' : 'text'"
+                   [(ngModel)]="password" name="password" #pass="ngModel">
+            <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+         <!-- Removed in favor of Angular Material's default error behvior
+            <div [hidden]="pass.valid || pass.pristine" class="alert alert-danger">
+             Password is required
+            </div>
+          -->
+          </mat-form-field>
+        </div>
+      </mat-tab>
 
-    <button type="submit" class="btn btn-success"
-            [disabled]="!calendarForm.form.valid">Test</button>
+      <mat-tab label="Service Account">
+        <div class="form-group">
+          <button mat-raised-button color="primary" (click)="setServiceAccount()">
+            <span *ngIf="!svcAcct">Enable Service Account</span>
+            <span *ngIf="svcAcct">Disable Service Account</span>
+          </button>
+          <label *ngIf="svcAcct">
+            <input matInput placeholder="Resource Account Name" type="text"
+                   [(ngModel)]="resourceAcct" name="resource-account">
+          </label>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Submit">
+        <button mat-raised-button color="primary" type="submit"
+                [disabled]="!calendarForm.form.valid">Test</button>
+      </mat-tab>
+    </mat-tab-group>
   </form>
+</div>
 
-  <div class="login-success" *ngIf="!isErrorResult">
-    {{response}}
-  </div>
-  <div class="login-failure" *ngIf="isErrorResult">
-    {{response}}
-  </div>
+<div class="container">
+  <mat-tree [dataSource]="nestedDataSource" [treeControl]="nestedTreeControl" class="example-tree">
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
+      <li class="mat-tree-node">
+        <button mat-icon-button disabled></button>
+        {{node.filename}}:  {{node.type}}
+      </li>
+    </mat-tree-node>
+  
+    <mat-nested-tree-node *matTreeNodeDef="let node; when: hasNestedChild">
+      <li>
+        <div class="mat-tree-node">
+          <button mat-icon-button matTreeNodeToggle
+                  [attr.aria-label]="'toggle ' + node.filename">
+            <mat-icon class="mat-icon-rtl-mirror">
+              {{nestedTreeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+            </mat-icon>
+          </button>
+          {{node.filename}}
+        </div>
+        <ul [class.example-tree-invisible]="!nestedTreeControl.isExpanded(node)">
+          <ng-container matTreeNodeOutlet></ng-container>
+        </ul>
+      </li>
+    </mat-nested-tree-node>
+  </mat-tree>
 </div>
