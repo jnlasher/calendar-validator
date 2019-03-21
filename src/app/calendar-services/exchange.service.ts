@@ -47,9 +47,8 @@ export class ExchangeService {
                                 </soap:Envelope>`
 
     return this.http
-      .post(
-        requestURL, baseXML, {headers: headers, responseType: 'text'}
-      ).pipe(catchError(this.handleError()));
+      .post(requestURL, baseXML, {headers: headers, responseType: 'text'})
+      .pipe(catchError(this.handleError()));
   }
 
   getImpersonationRole(): Observable<any> {
@@ -69,9 +68,8 @@ export class ExchangeService {
                                 </soap:Envelope>`
 
     return this.http
-      .post(
-        requestURL, baseXML, {headers: headers, responseType: 'text'}
-      ).pipe(catchError(this.handleError()));
+      .post(requestURL, baseXML, {headers: headers, responseType: 'text'})
+      .pipe(catchError(this.handleError()));
   }
 
   setFolderId(xmlData: string): string {

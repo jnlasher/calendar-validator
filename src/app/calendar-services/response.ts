@@ -1,9 +1,12 @@
 export class ErrorResponse {
   // HTTP status codes
   public static readonly OK:           number = 200;
+  public static readonly BAD_REQUEST:  number = 400;
   public static readonly UNAUTHORIZED: number = 401;
   public static readonly FORBIDDEN:    number = 403;
   public static readonly NOT_FOUND:    number = 404;
+  public static readonly PENDING:      number = 428;
+  public static readonly UNKNOWN:      number = 429;
   public static readonly SERVER_ERROR: number = 500;
 
   // response properties

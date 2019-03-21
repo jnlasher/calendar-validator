@@ -3,3 +3,9 @@
 .container {
     padding: 30px;
 }
+
+ul {
+    list-style-type: none;
+    text-align: left;
+    margin-left: 80px;
+}

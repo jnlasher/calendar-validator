@@ -1,8 +1,48 @@
+<!DOCTYPE html>
 <div class="container">
-    <h1 class="mat-title">Google Calendar Entry</h1>
-    <div class="Block">
-        <label id="lbl">JSON File</label>
-        <input type='file' (change)="fileListener($event)">
-    </div>
-    <button mat-raised-button color="accent" (click)="createCalendarObject()">Upload</button>
+  <h1 class="mat-title">Google Calendar Entry</h1>
+</div>
+<div class="container">
+  <mat-horizontal-stepper #stepper>
+    <mat-step>
+      <div class="Block">
+        <label id="lbl">
+          JSON File
+          <input mat-raised-button type="file" (change)="fileListener($event)">
+        </label>
+      </div>
+      <button mat-raised-button color="accent" matStepperNext type="button" 
+              (click)="createCalendarObject()">Upload</button>
+    </mat-step>
+    <mat-step>
+      <label *ngIf="isAuthResponse">
+        <span>{{userCode}}</span>
+        <script>setCountdown("timer", "1800");</script>
+        <p>Expires In: {{minutes}} minutes {{seconds}} seconds</p>
+        <span>
+          <button mat-raised-button matStepperNext color="primary" onclick="openWindow(this.id)" id="redirect-button">
+            Click To Authorize
+          </button>
+        </span>
+      </label>
+    </mat-step>
+    <mat-step>
+      <button *ngIf="!isAuthorized" mat-raised-button (click)="checkStatus()">Check Status</button>
+      <label *ngIf="isAuthorized">
+        <div>
+          <span>Success!</span>
+        </div>
+        <div>
+          <button mat-raised-button type="button" (click)="listCalendars()">List Calendars</button>
+        </div>
+        <ul class="calendar-display">
+          <li *ngFor="let calendar of calendarArray">
+            <button mat-raised-button type="button" (click)="listEvents(calendar)">Events</button>
+            Name: {{calendar.summary}}
+            Address: {{calendar.id}}
+          </li>
+        </ul>
+      </label>
+    </mat-step>
+  </mat-horizontal-stepper>
 </div>
