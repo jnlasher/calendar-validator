@@ -1,16 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { interval } from 'rxjs';
+import { NestedTreeControl } from '@angular/cdk/tree';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { interval, BehaviorSubject } from 'rxjs';
 
 import { GcalendarService } from '../calendar-services/gcalendar.service';
 import { GCalendar, GCalendarEvent } from '../calendar-services/gCalendar';
 import { ErrorResponse } from '../calendar-services/response';
+import { FileNode, FileDatabase } from '../database-services/database.service';
+
 
 const MS_PER_SECOND = 1000;
 
 @Component({
   selector: 'app-google-calendar',
   templateUrl: './google-calendar.component.html',
-  styleUrls: ['./google-calendar.component.css']
+  styleUrls: ['./google-calendar.component.css'],
+  providers: [FileDatabase]
 })
 export class GoogleCalendarComponent implements OnInit {
   file:           any;
@@ -25,9 +30,26 @@ export class GoogleCalendarComponent implements OnInit {
   calendarArray:  GCalendar[] = [];
   eventsArray:    GCalendarEvent[] = [];
 
-  constructor(private gcalendarService: GcalendarService) { }
+  // Database instances
+  database:          FileDatabase;
+  nestedTreeControl: NestedTreeControl<FileNode>;
+  nestedDataSource:  MatTreeNestedDataSource<FileNode>;
+  dataChange:        BehaviorSubject<FileNode[]>;
+  results:           FileNode[] = [];
+
+  constructor(private gcalendarService: GcalendarService, database: FileDatabase) {
+    // Database object structure
+    this.database = database;
+    this.nestedTreeControl = new NestedTreeControl<FileNode>(this._getChildren);
+    this.nestedDataSource = new MatTreeNestedDataSource();
+    this.database.dataChange.subscribe(data => this.nestedDataSource.data = data);
+  }
   ngOnInit() { }
   onSubmit() { console.log("Submitted Google calendar"); }
+
+  _getChildren = (node: FileNode) => node.children;
+
+  hasNestedChild = (_: number, nodeData: FileNode) => !nodeData.type;
 
   fileListener($event): void {
     this.readDocument($event.target);
@@ -77,8 +99,8 @@ export class GoogleCalendarComponent implements OnInit {
   listEvents(calendar: GCalendar) {
     let id: string = calendar.id;
     this.gcalendarService.findCalendarEvents(id)
-    .subscribe(
-      response => this.displayEvents(JSON.stringify(response))
+    .subscribe(response => 
+      this.displayEvents(JSON.stringify(response))
     );
   }
 
@@ -103,18 +125,41 @@ export class GoogleCalendarComponent implements OnInit {
   private handlePollingResponse(response: string) {
     console.log("Raw response: " + response);
     let parsedResponse = JSON.parse(response);
-    if(parsedResponse["status"] == ErrorResponse.PENDING) {
-      // TODO
-    } else if(parsedResponse["status"] == ErrorResponse.FORBIDDEN) {
-      // TODO
-    } else if (parsedResponse["status"] == ErrorResponse.UNKNOWN) {
-      // TODO
-    } else if(parsedResponse["status"] == undefined && parsedResponse["access_token"]) { // 200 OK returns no status
+    if(parsedResponse["status"] == undefined && parsedResponse["access_token"]) { // 200 OK returns no status
       this.gcalendarService.setAccessToken(parsedResponse["access_token"]);
       this.gcalendarService.setRefreshToken(parsedResponse["refresh_token"]);
       this.gcalendarService.setTokenType(parsedResponse["token_type"]);
       this.isAuthorized = true;
+    } else {
+      this.parseErrorResult(parsedResponse);
     }
+  }
+
+  parseErrorResult(error: Object) {
+    let message = "An unknown error occurred";
+    if(error["status"] == ErrorResponse.PENDING) {
+      message = "Awaiting permission from the authorization server";
+    } else if(error["status"] == ErrorResponse.FORBIDDEN) {
+      message = "Permission was denied by the user";
+    } else if (error["status"] == ErrorResponse.UNKNOWN) {
+      message = "Polling too often... please wait a moment and try again";
+    }
+
+    let nodeString = JSON.stringify({
+      Details: {
+        StatusCode: error["status"],
+        Name: error["error"]["error"],
+        Message: message,
+        MessageDetails: error["error"]["error_description"]
+      }
+    });
+
+    let nodes = this.database.buildFileTree(JSON.parse(nodeString), 0);
+    nodes.forEach(element => {
+      this.results.push(element);
+    });
+    
+    this.database.dataChange.next(this.results);
   }
 
   private displayCalendars(response: string) {
@@ -125,5 +170,11 @@ export class GoogleCalendarComponent implements OnInit {
     });
   }
 
-  displayEvents(response: string) {}
+  private displayEvents(response: string) {
+    let eventData = JSON.parse(response);
+    eventData.items.forEach(event => {
+      this.eventsArray.push(event);
+      console.log("Events Array: " + this.eventsArray);
+    });
+  }
 }

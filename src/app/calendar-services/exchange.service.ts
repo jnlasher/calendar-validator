@@ -35,16 +35,17 @@ export class ExchangeService {
       'Authorization': 'Basic ' + btoa(this.abstractCalendar.username + ":" + this.abstractCalendar.password)
     });
     const requestURL : string = this.abstractCalendar.serverAddress + this.baseURL;
-    const baseXML : string = `<?xml version="1.0" encoding="utf-8"?>
-                                <soap:Envelope ${this.soapEnvelope} >
-                                  <soap:Header>
-                                    <t:RequestServerVersion Version="Exchange2007_SP1" />
-                                    ${this.exchImpString}
-                                  </soap:Header>
-                                  <soap:Body>
-                                    ${this.folderDetails}
-                                  </soap:Body>
-                                </soap:Envelope>`
+    const baseXML : string = `
+    <?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope ${this.soapEnvelope} >
+      <soap:Header>
+        <t:RequestServerVersion Version="Exchange2007_SP1" />
+        ${this.exchImpString}
+      </soap:Header>
+      <soap:Body>
+        ${this.folderDetails}
+      </soap:Body>
+    </soap:Envelope>`
 
     return this.http
       .post(requestURL, baseXML, {headers: headers, responseType: 'text'})
@@ -57,15 +58,58 @@ export class ExchangeService {
       'Authorization': 'Basic ' + btoa(this.abstractCalendar.username + ":" + this.abstractCalendar.password)
     });
     const requestURL : string = this.abstractCalendar.serverAddress + this.baseURL;
-    const baseXML : string = `<?xml version="1.0" encoding="utf-8"?>
-                                <soap:Envelope ${this.soapEnvelope}>
-                                  <soap:Header>
-                                    ${this.exchImpString}
-                                  </soap:Header>
-                                  <soap:Body>
-                                    ${this.folderDetails}
-                                  </soap:Body>
-                                </soap:Envelope>`
+    const baseXML : string = `
+    <?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope ${this.soapEnvelope}>
+      <soap:Header>
+        ${this.exchImpString}
+      </soap:Header>
+      <soap:Body>
+        ${this.folderDetails}
+      </soap:Body>
+    </soap:Envelope>`
+
+    return this.http
+      .post(requestURL, baseXML, {headers: headers, responseType: 'text'})
+      .pipe(catchError(this.handleError()));
+  }
+
+  getEventData(): Observable<any> {
+    let headers = new HttpHeaders({
+      'Content-Type': 'text/xml',
+      'Authorization': 'Basic ' + btoa(this.abstractCalendar.username + ":" + this.abstractCalendar.password)
+    });
+    const requestURL : string = this.abstractCalendar.serverAddress + this.baseURL;
+    const baseXML : string = `
+    <soap:Envelope 
+    xmlns:ns0="http://schemas.xmlsoap.org/soap/envelope/" 
+    xmlns:ns1="http://schemas.microsoft.com/exchange/services/2006/types" 
+    xmlns:ns2="http://schemas.microsoft.com/exchange/services/2006/messages">
+        <ns0:Header>
+        </ns0:Header>
+        <ns0:Body>
+            <ns2:FindItem Traversal="Shallow">
+                <ns2:ItemShape>
+                    <ns1:BaseShape>Default</ns1:BaseShape>
+                    <ns1:AdditionalProperties>
+                        <ns1:FieldURI FieldURI="item:DateTimeCreated" />
+                        <ns1:FieldURI FieldURI="calendar:IsRecurring" />
+                        <ns1:FieldURI FieldURI="calendar:Organizer" />
+                        <ns1:FieldURI FieldURI="calendar:Duration" />
+                        <ns1:FieldURI FieldURI="calendar:LegacyFreeBusyStatus" />
+                    </ns1:AdditionalProperties>
+                </ns2:ItemShape>
+                <ns2:CalendarView EndDate="2019-03-19T23:59:59.000000" StartDate="2019-03-19T00:00:00.000000" />
+                <ns2:ParentFolderIds>
+                    <ns1:DistinguishedFolderId Id="calendar">
+                        <ns1:Mailbox>
+                            <ns1:EmailAddress>jlasher@extron.com</ns1:EmailAddress>
+                        </ns1:Mailbox>
+                    </ns1:DistinguishedFolderId>
+                </ns2:ParentFolderIds>
+            </ns2:FindItem>
+        </ns0:Body>
+    </ns0:Envelope>`
 
     return this.http
       .post(requestURL, baseXML, {headers: headers, responseType: 'text'})

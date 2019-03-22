@@ -39,7 +39,7 @@ export class GcalendarService {
   setRefreshToken(refreshToken: string) { this.refreshToken = refreshToken; }
   setTokenType(tokenType: string) { this.tokenType = tokenType; }
 
-  oauthSignIn() {
+  oauthSignIn(): Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -54,7 +54,7 @@ export class GcalendarService {
       .pipe(catchError(this.handleError()));
   }
 
-  pollStatus() {
+  pollStatus(): Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -71,7 +71,7 @@ export class GcalendarService {
       .pipe(catchError(this.handleError()));
   }
 
-  listCalendars() {
+  listCalendars(): Observable<any> {
     if(!this.accessToken) { return; }
     let path = `/users/me/calendarList`;
 
@@ -84,7 +84,7 @@ export class GcalendarService {
       .pipe(catchError(this.handleError()));
   }
 
-  findCalendarEvents(calendarId: string) {
+  findCalendarEvents(calendarId: string): Observable<any> {
     if(!this.accessToken) { return; }
     let path = `/calendars/${calendarId}/events`;
 
