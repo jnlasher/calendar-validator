@@ -80,6 +80,7 @@ export class OfficeThreesixfiveComponent implements OnInit {
 
   parseResponse(data: Observable<any>) {
     if(typeof data == "string") {
+      console.log("Success");
     } else if (typeof data == "object") {
       this.parseErrorResult(JSON.stringify(data));
     }

@@ -8,7 +8,6 @@ import { GCalendar, GCalendarEvent } from '../calendar-services/gCalendar';
 import { ErrorResponse } from '../calendar-services/response';
 import { FileNode, FileDatabase } from '../database-services/database.service';
 
-
 const MS_PER_SECOND = 1000;
 
 @Component({

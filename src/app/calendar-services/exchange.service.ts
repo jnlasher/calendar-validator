@@ -35,9 +35,8 @@ export class ExchangeService {
       'Authorization': 'Basic ' + btoa(this.abstractCalendar.username + ":" + this.abstractCalendar.password)
     });
     const requestURL : string = this.abstractCalendar.serverAddress + this.baseURL;
-    const baseXML : string = `
-    <?xml version="1.0" encoding="utf-8"?>
-    <soap:Envelope ${this.soapEnvelope} >
+    const baseXML : string = `<?xml version="1.0" encoding="utf-8"?>
+    <soap:Envelope ${this.soapEnvelope}>
       <soap:Header>
         <t:RequestServerVersion Version="Exchange2007_SP1" />
         ${this.exchImpString}
@@ -46,7 +45,7 @@ export class ExchangeService {
         ${this.folderDetails}
       </soap:Body>
     </soap:Envelope>`
-
+    console.log("Base XML: " + baseXML);
     return this.http
       .post(requestURL, baseXML, {headers: headers, responseType: 'text'})
       .pipe(catchError(this.handleError()));
@@ -58,8 +57,7 @@ export class ExchangeService {
       'Authorization': 'Basic ' + btoa(this.abstractCalendar.username + ":" + this.abstractCalendar.password)
     });
     const requestURL : string = this.abstractCalendar.serverAddress + this.baseURL;
-    const baseXML : string = `
-    <?xml version="1.0" encoding="utf-8"?>
+    const baseXML : string = `<?xml version="1.0" encoding="utf-8"?>
     <soap:Envelope ${this.soapEnvelope}>
       <soap:Header>
         ${this.exchImpString}
